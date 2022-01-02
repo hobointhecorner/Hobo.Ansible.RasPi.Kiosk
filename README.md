@@ -5,5 +5,5 @@
 
 ## Variables
 | Name          | Type   | Required | Default | Desctiption |
-|------------------------|----------|---------|-------------|
+|---------------|--------|----------|---------|-------------|
 | rpi_kiosk_url | string | Yes      |         | URL for the Raspberry Pi kiosk to display on boot |
