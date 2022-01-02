@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: Hobo.Ansible.RasPi.Common
+    rpi_autologin: yes
+    rpi_enable_ui: no

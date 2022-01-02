@@ -1,0 +1,60 @@
+---
+- name: Ensure gui components
+  become: yes
+  apt:
+    name:
+      - xserver-xorg
+      - x11-xserver-utils
+      - xinit
+      - xinput
+      - xterm
+      - openbox
+    install_recommends: no
+
+- name: Ensure chromium
+  become: yes
+  apt:
+    name: "chromium-browser"
+    install_recommends: no
+
+# Kiosk setup
+# https://chronicdev.io/devlog/raspberry-pi-web-app-asp-dotnet-core
+- name: Configure openbox autostart
+  become: yes
+  blockinfile:
+    path: /etc/xdg/openbox/autostart
+    block: |
+      # Remove exit errors from the config files that could trigger a warning
+      sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' ~/.config/chromium/'Local State'
+      sed -i 's/"exited_cleanly":false/"exited_cleanly":true/; s/"exit_type":"[^"]\+"/"exit_type":"Normal"/' ~/.config/chromium/Default/Preferences
+
+      # Run Chromium in kiosk mode
+      chromium-browser  --noerrdialogs --disable-infobars --check-for-update-interval=31536000 --kiosk $KIOSK_URL
+
+      # Open a terminal if chromium is closed
+      xterm
+  notify:
+    - Restart computer
+
+- name: Configure openbox environment
+  become: yes
+  blockinfile:
+    path: /etc/xdg/openbox/environment
+    block: export KIOSK_URL={{ rpi_kiosk_url }}
+  notify:
+    - Restart computer
+
+- name: Use xserver by default
+  alternatives:
+    name: x-session-manager
+    path: /usr/bin/openbox-session
+    priority: 40
+
+- name: Configure bash profile
+  blockinfile:
+    path: /home/pi/.profile
+    create: yes
+    block: |
+      [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor
+  notify:
+    - Restart computer
