@@ -1,5 +1,5 @@
 ---
-- name: Ensure gui components
+- name: Ensure components
   become: yes
   apt:
     name:
@@ -9,12 +9,7 @@
       - xinput
       - xterm
       - openbox
-    install_recommends: no
-
-- name: Ensure chromium
-  become: yes
-  apt:
-    name: "chromium-browser"
+      - chromium-browser
     install_recommends: no
 
 # Kiosk setup
